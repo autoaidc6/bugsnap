@@ -1,0 +1,7 @@
+{
+  "name": "BugSnap",
+  "description": "Instant AI-powered insect identification and pest control guide.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
