@@ -1,0 +1,21 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10B981" />
+      <stop offset="1" stop-color="#047857" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grad)"/>
+  <circle cx="100" cy="100" r="300" fill="white" fill-opacity="0.1"/>
+  <circle cx="1100" cy="530" r="300" fill="white" fill-opacity="0.1"/>
+  
+  <g transform="translate(600, 260)">
+    <circle r="100" fill="white" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));"/>
+    <g transform="scale(3.5) translate(-12, -12)">
+        <path stroke="#10B981" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+    </g>
+  </g>
+  
+  <text x="600" y="450" font-family="sans-serif" font-weight="bold" font-size="80" fill="white" text-anchor="middle" letter-spacing="-2" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2));">BugSnap</text>
+  <text x="600" y="520" font-family="sans-serif" font-weight="normal" font-size="32" fill="white" fill-opacity="0.9" text-anchor="middle">AI Insect Identification</text>
+</svg>
