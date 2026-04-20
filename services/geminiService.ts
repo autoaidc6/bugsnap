@@ -1,7 +1,18 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { InsectData } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY_MISSING");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 const insectSchema: Schema = {
   type: Type.OBJECT,
@@ -32,6 +43,7 @@ export const identifyInsect = async (base64Image: string): Promise<InsectData> =
   const cleanBase64 = base64Image.split(',')[1] || base64Image;
 
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: {

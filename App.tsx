@@ -19,6 +19,11 @@ const App: React.FC = () => {
 
   // Load history from local storage on mount
   useEffect(() => {
+    // Check for API key
+    if (!process.env.GEMINI_API_KEY && !process.env.API_KEY) {
+      setError("Gemini API Key is not configured. Please add GEMINI_API_KEY to your environment variables.");
+    }
+
     const savedHistory = localStorage.getItem('bugsnap_history');
     if (savedHistory) {
       try {
@@ -53,9 +58,13 @@ const App: React.FC = () => {
       };
       
       setHistory(prev => [newItem, ...prev]);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to identify the insect. The image might be blurry or the service is temporarily unavailable.");
+      if (err.message === "GEMINI_API_KEY_MISSING") {
+        setError("Gemini API Key is missing. Please configure it in your environment variables.");
+      } else {
+        setError("Failed to identify the insect. The image might be blurry or the service is temporarily unavailable.");
+      }
       setCurrentImage(null);
     } finally {
       setIsLoading(false);
