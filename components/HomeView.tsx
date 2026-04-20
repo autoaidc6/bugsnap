@@ -3,9 +3,16 @@ import React, { useState, useRef } from 'react';
 interface HomeViewProps {
   onImageSelected: (base64: string) => void;
   isLoading: boolean;
+  error?: string | null;
+  onClearError?: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ onImageSelected, isLoading }) => {
+export const HomeView: React.FC<HomeViewProps> = ({ 
+  onImageSelected, 
+  isLoading, 
+  error,
+  onClearError 
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -172,6 +179,22 @@ export const HomeView: React.FC<HomeViewProps> = ({ onImageSelected, isLoading }
           </span>
         </div>
       </div>
+
+      {error && (
+        <div className="mt-8 p-4 bg-red-50 text-red-700 rounded-lg text-center border border-red-200 animate-fade-in flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+          </div>
+          <button onClick={onClearError} className="p-1 hover:bg-red-100 rounded-full transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {cameraError && (
         <div className="mt-8 p-4 bg-red-50 text-red-700 rounded-lg text-center border border-red-200">

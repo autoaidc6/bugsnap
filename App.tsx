@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [currentInsect, setCurrentInsect] = useState<InsectData | null>(null);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -35,6 +36,7 @@ const App: React.FC = () => {
 
   const handleIdentify = async (base64Image: string) => {
     setIsLoading(true);
+    setError(null);
     setCurrentImage(base64Image);
     setCurrentInsect(null); // Clear previous result
     
@@ -51,8 +53,9 @@ const App: React.FC = () => {
       };
       
       setHistory(prev => [newItem, ...prev]);
-    } catch (error) {
-      alert("Failed to identify the insect. Please try a clearer image.");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to identify the insect. The image might be blurry or the service is temporarily unavailable.");
       setCurrentImage(null);
     } finally {
       setIsLoading(false);
@@ -62,6 +65,7 @@ const App: React.FC = () => {
   const handleReset = () => {
     setCurrentInsect(null);
     setCurrentImage(null);
+    setError(null);
     setCurrentView(AppView.IDENTIFY);
   };
 
@@ -87,6 +91,8 @@ const App: React.FC = () => {
           <HomeView 
             onImageSelected={handleIdentify} 
             isLoading={isLoading} 
+            error={error}
+            onClearError={() => setError(null)}
           />
         );
       case AppView.HISTORY:

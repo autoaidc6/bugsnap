@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { InsectData } from '../types';
 
 interface ResultCardProps {
@@ -8,23 +9,54 @@ interface ResultCardProps {
 }
 
 export const ResultCard: React.FC<ResultCardProps> = ({ data, imageUrl, onReset }) => {
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setMousePos({ x, y });
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+      >
         
-        {/* Header Image */}
-        <div className="relative h-64 sm:h-80 bg-gray-100">
-          <img 
+        {/* Header Image with Zoom */}
+        <div 
+          className="relative h-64 sm:h-96 bg-gray-100 overflow-hidden group cursor-zoom-in"
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <motion.img 
             src={imageUrl} 
             alt={data.commonName} 
             className="w-full h-full object-cover"
+            animate={{ 
+              scale: isHovering ? 2 : 1,
+              originX: mousePos.x / 100,
+              originY: mousePos.y / 100
+            }}
+            transition={{ type: 'spring', stiffness: 150, damping: 20, mass: 0.5 }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+          
+          {/* Overlay Text - Fades out on zoom to allow clear view */}
+          <motion.div 
+            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end pointer-events-none"
+            animate={{ opacity: isHovering ? 0.2 : 1 }}
+            transition={{ duration: 0.3 }}
+          >
             <div className="p-6 sm:p-8 text-white w-full">
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                  <h2 className="text-3xl sm:text-4xl font-bold mb-1">{data.commonName}</h2>
-                  <p className="text-lg opacity-90 italic">{data.scientificName}</p>
+                  <h2 className="text-3xl sm:text-4xl font-bold mb-1 drop-shadow-md">{data.commonName}</h2>
+                  <p className="text-lg opacity-90 italic drop-shadow-sm">{data.scientificName}</p>
                 </div>
                 <div className="flex gap-2">
                   {data.isPest && (
@@ -43,7 +75,24 @@ export const ResultCard: React.FC<ResultCardProps> = ({ data, imageUrl, onReset 
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Zoom hint */}
+          <AnimatePresence>
+            {!isHovering && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute top-4 right-4 bg-black/30 backdrop-blur-md text-white/90 px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 pointer-events-none border border-white/10"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                </svg>
+                Hover to zoom
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Content */}
@@ -152,7 +201,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({ data, imageUrl, onReset 
             Identify Another
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

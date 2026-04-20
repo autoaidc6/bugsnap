@@ -33,7 +33,7 @@ export const identifyInsect = async (base64Image: string): Promise<InsectData> =
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       contents: {
         parts: [
           {
@@ -43,7 +43,7 @@ export const identifyInsect = async (base64Image: string): Promise<InsectData> =
             }
           },
           {
-            text: "Identify this insect. If it is not an insect or bug, return 'Unknown' for names but still try to describe it."
+            text: "Identify this insect in the image. Provide detailed information including its common name, scientific name, and behavior. If it's a pest, provide eco-friendly solutions. Return the data in the specified JSON format."
           }
         ]
       },
