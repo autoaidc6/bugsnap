@@ -1,79 +1,30 @@
-import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { InsectData } from "../types";
 
-let aiInstance: GoogleGenAI | null = null;
-
-const getAI = () => {
-  if (!aiInstance) {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY_MISSING");
-    }
-    aiInstance = new GoogleGenAI({ apiKey });
-  }
-  return aiInstance;
-};
-
-const insectSchema: Schema = {
-  type: Type.OBJECT,
-  properties: {
-    commonName: { type: Type.STRING, description: "Common name of the insect" },
-    scientificName: { type: Type.STRING, description: "Scientific name of the insect" },
-    description: { type: Type.STRING, description: "A brief, 2-sentence description of the insect." },
-    toxicity: { type: Type.STRING, description: "Toxicity level (e.g., Non-toxic, Mildly toxic, Highly toxic) and bite/sting info." },
-    habitat: { type: Type.STRING, description: "Typical habitat where this insect is found." },
-    behavior: { type: Type.STRING, description: "Key behavioral traits (e.g., solitary, swarming, nocturnal)." },
-    isPest: { type: Type.BOOLEAN, description: "True if generally considered a garden or household pest." },
-    pestSolutions: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "List of 3 eco-friendly pest control solutions if it is a pest, otherwise empty."
-    },
-    safetyTips: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "Safety tips if the insect is dangerous or venomous."
-    }
-  },
-  required: ["commonName", "scientificName", "description", "toxicity", "habitat", "behavior", "isPest", "pestSolutions", "safetyTips"]
-};
-
 export const identifyInsect = async (base64Image: string): Promise<InsectData> => {
-  // Remove header if present (e.g., "data:image/jpeg;base64,")
-  const cleanBase64 = base64Image.split(',')[1] || base64Image;
-
   try {
-    const ai = getAI();
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: "image/jpeg",
-              data: cleanBase64
-            }
-          },
-          {
-            text: "Identify this insect in the image. Provide detailed information including its common name, scientific name, and behavior. If it's a pest, provide eco-friendly solutions. Return the data in the specified JSON format."
-          }
-        ]
+    const response = await fetch("/api/identify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: insectSchema,
-        temperature: 0.4, 
-      }
+      body: JSON.stringify({ base64Image }),
     });
 
-    const text = response.text;
-    if (!text) {
-      throw new Error("No response from AI");
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      if (errorData.error === "GEMINI_API_KEY_MISSING") {
+        throw new Error("GEMINI_API_KEY_MISSING");
+      }
+      throw new Error(errorData.message || "Failed to identify insect. Please try again.");
     }
 
-    return JSON.parse(text) as InsectData;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error("Failed to identify insect. Please try again.");
+    const data = await response.json();
+    return data as InsectData;
+  } catch (error: any) {
+    console.error("Client identification fetch error:", error);
+    if (error.message === "GEMINI_API_KEY_MISSING") {
+      throw new Error("GEMINI_API_KEY_MISSING");
+    }
+    throw new Error(error.message || "Failed to identify insect. Please try again.");
   }
 };

@@ -19,11 +19,6 @@ const App: React.FC = () => {
 
   // Load history from local storage on mount
   useEffect(() => {
-    // Check for API key
-    if (!process.env.GEMINI_API_KEY && !process.env.API_KEY) {
-      setError("Gemini API Key is not configured. Please add GEMINI_API_KEY to your environment variables.");
-    }
-
     const savedHistory = localStorage.getItem('bugsnap_history');
     if (savedHistory) {
       try {
