@@ -45,7 +45,7 @@ export const identifyInsect = async (base64Image: string): Promise<InsectData> =
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3.5-flash",
       contents: {
         parts: [
           {
